@@ -7,10 +7,11 @@
 
 import Foundation
 
-struct DefaultGhibliService : GhibliService {
-    func fetch<T: Decodable>(from URLString: String, type : T.Type) async throws -> T{
+struct DefaultGhibliService: GhibliService {
+    
+    func fetch<T: Decodable>(from URLString: String, type: T.Type,) async throws -> T {
         guard let url = URL(string: URLString) else {
-            throw APIError.invalidURL
+            throw APIError.invalideURL
         }
         
         do {
@@ -31,11 +32,19 @@ struct DefaultGhibliService : GhibliService {
     
     func fetchFilms() async throws -> [Film] {
         let url = "https://ghibliapi.vercel.app/films"
-        return try await self.fetch(from: url, type: [Film].self)
+        return try await fetch(from: url, type: [Film].self)
+    }
+    
+    
+    func searchFilm(for searchTerm: String) async throws -> [Film] {
+        let allFilms = try await fetchFilms() //dont have a search endpoint otherwise would do this here
+        
+        return allFilms.filter { film in
+            film.title.localizedStandardContains(searchTerm)
+        }
     }
     
     func fetchPerson(from URLString: String) async throws -> Person {
-        return try await self.fetch(from: URLString, type: Person.self)
+        return try await fetch(from: URLString, type: Person.self)
     }
-     
 }

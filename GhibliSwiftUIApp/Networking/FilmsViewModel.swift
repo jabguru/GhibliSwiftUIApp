@@ -8,18 +8,10 @@
 import Foundation
 import Observation
 
-
 @Observable
-class FilmsViewModel{
-    enum State : Equatable{
-        case idle
-        case loading
-        case loaded([Film])
-        case error(String)
-    }
-    
-    var state: State = .idle
-    var films: [Film] = []
+class FilmsViewModel {
+
+    var state: LoadingState<[Film]> = .idle
     
     private let service: GhibliService
     
@@ -28,8 +20,7 @@ class FilmsViewModel{
     }
     
     func fetch() async {
-        
-        guard state == .idle else { return }
+        guard !state.isLoading || state.error != nil else { return }
         
         state = .loading
         
@@ -37,10 +28,19 @@ class FilmsViewModel{
             let films = try await service.fetchFilms()
             self.state = .loaded(films)
         } catch let error as APIError {
-            self.state = .error(error.errorDescription ?? "Unkown error")
+            self.state = .error(error.errorDescription ?? "unknown error")
         } catch {
-            self.state = .error("Unkown error")
+            self.state = .error("unknown error")
         }
     }
     
+    
+// MARK: - Preview
+    
+    static var example: FilmsViewModel {
+        let vm = FilmsViewModel(service: MockGhibliService())
+        vm.state = .loaded([Film.example, Film.exampleFavorite])
+        return vm
+    }
+
 }

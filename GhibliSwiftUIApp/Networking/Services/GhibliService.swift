@@ -1,5 +1,5 @@
 //
-//  GhibliService.swift
+//  File.swift
 //  GhibliSwiftUIApp
 //
 //  Created by Julius Alibrown on 04/08/2026.
@@ -7,7 +7,10 @@
 
 import Foundation
 
-protocol GhibliService : Sendable {
+
+protocol GhibliService: Sendable {
     func fetchFilms() async throws -> [Film]
     func fetchPerson(from URLString: String) async throws -> Person
+    
+    func searchFilm(for searchTerm: String) async throws -> [Film]
 }

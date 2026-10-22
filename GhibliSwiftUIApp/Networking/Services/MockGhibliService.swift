@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MockGhibliService : GhibliService {
+struct MockGhibliService: GhibliService {
     
     private struct SampleData: Decodable {
         let films: [Film]
@@ -16,7 +16,7 @@ struct MockGhibliService : GhibliService {
     
     private func loadSampleData() throws -> SampleData {
          guard let url = Bundle.main.url(forResource: "SampleData", withExtension: "json") else {
-             throw APIError.invalidURL
+             throw APIError.invalideURL
          }
          do {
              let data = try Data(contentsOf: url)
@@ -36,16 +36,23 @@ struct MockGhibliService : GhibliService {
         return data.films
     }
     
+    func searchFilm(for searchTerm: String) async throws -> [Film] {
+        let allFilms = try await fetchFilms()
+        
+        return allFilms.filter { film in
+            film.title.localizedStandardContains(searchTerm)
+        }
+    }
+
     func fetchPerson(from URLString: String) async throws -> Person {
         let data = try loadSampleData()
         return data.people.first!
     }
     
     //MARK: - preview/testing only
+    
     func fetchFilm() -> Film {
         let data = try! loadSampleData()
         return data.films.first!
     }
-    
-    
 }

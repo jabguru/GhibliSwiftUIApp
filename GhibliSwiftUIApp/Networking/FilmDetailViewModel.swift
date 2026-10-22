@@ -37,7 +37,7 @@ class FilmDetailViewModel {
                 
                 // collect results as they complete
                 for try await person in group {
-                    loadedPeople.append(person) 
+                    loadedPeople.append(person)
                 }
             }
             
