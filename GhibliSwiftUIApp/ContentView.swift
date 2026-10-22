@@ -36,6 +36,8 @@ struct ContentView: View {
             favoritesViewModel.load()
             await filmsViewModel.fetch()
         }
+        // Picks the pastel or cinematic theme from light/dark mode and shares it with every screen.
+        .ghibliTheme()
         .setAppearanceTheme()
     }
 }

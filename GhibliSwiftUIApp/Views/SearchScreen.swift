@@ -8,33 +8,42 @@
 import SwiftUI
 
 struct SearchScreen: View {
-    
+
     @State private var text: String = ""
     @State private var searchViewModel: SearchFilmsViewModel
     let favoritesViewModel: FavoritesViewModel
-    
+
     init(favoritesViewModel: FavoritesViewModel,
          service: GhibliService = DefaultGhibliService()) {
         self.favoritesViewModel = favoritesViewModel
         self.searchViewModel = SearchFilmsViewModel(service: service)
     }
-    
+
     var body: some View {
         NavigationStack {
-            VStack {
+            Group {
                 switch searchViewModel.state {
                     case .idle:
-                        Text("Your search results will be shown here.")
-                            .foregroundStyle(.secondary)
+                        AnimatedStateView(systemImage: "sparkle.magnifyingglass",
+                                          title: "Find a film",
+                                          message: "Search by title, like “Totoro” or “Spirited Away”.")
                     case .loading:
-                        ProgressView()
+                        SkeletonGrid()
                     case .error(let error):
-                        Text(error)
+                        AnimatedStateView(systemImage: "exclamationmark.icloud",
+                                          title: "Search failed",
+                                          message: error)
+                    case .loaded(let films) where films.isEmpty:
+                        AnimatedStateView(systemImage: "wind",
+                                          title: "Nothing here",
+                                          message: "No film matches “\(text)”. Try another title.")
                     case .loaded(let films):
                         FilmListView(films: films,
                                      favoritesViewModel: favoritesViewModel)
                 }
             }
+            .animation(.smooth(duration: 0.35), value: searchViewModel.state)
+            .background { AnimatedBackground() }
             .navigationTitle("Search Ghibli Movies")
             .searchable(text: $text)
             .task(id: text) {
@@ -45,5 +54,7 @@ struct SearchScreen: View {
 }
 
 #Preview {
-    SearchScreen(favoritesViewModel: FavoritesViewModel(service: MockFavoriteStorage()))
+    SearchScreen(favoritesViewModel: FavoritesViewModel(service: MockFavoriteStorage()),
+                 service: MockGhibliService())
+        .ghibliTheme()
 }

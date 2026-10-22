@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct FavoritesScreen: View {
-    
+
     let filmsViewModel: FilmsViewModel
     let favoritesViewModel: FavoritesViewModel
-    
+
     var films: [Film] {
        let favorites = favoritesViewModel.favoriteIDs
         switch filmsViewModel.state {
@@ -20,17 +20,23 @@ struct FavoritesScreen: View {
             default: return []
         }
     }
-    
+
     var body: some View {
         NavigationStack {
             Group {
                 if films.isEmpty {
-                    ContentUnavailableView("No Favorites yet", systemImage: "heart")
+                    AnimatedStateView(systemImage: "heart.circle",
+                                      title: "No favorites yet",
+                                      message: "Tap the heart on any film and it will float over here.")
+                    .transition(.blurReplace)
                 } else {
                     FilmListView(films: films,
                                  favoritesViewModel: favoritesViewModel)
                 }
             }
+            // Removing the last favorite smoothly swaps the grid for the empty state.
+            .animation(.smooth, value: films.isEmpty)
+            .background { AnimatedBackground() }
             .navigationTitle("Favorites")
         }
     }
@@ -39,4 +45,5 @@ struct FavoritesScreen: View {
 #Preview {
     FavoritesScreen(filmsViewModel: FilmsViewModel.example,
                     favoritesViewModel: FavoritesViewModel.example)
+        .ghibliTheme()
 }
