@@ -267,12 +267,23 @@ fileprivate struct CharacterSectionView: View {
             Group {
                 switch viewModel.state {
                     case .idle, .loading:
-                        HStack(spacing: 12) {
-                            ForEach(0..<3, id: \.self) { _ in
-                                SkeletonBlock(cornerRadius: 20)
-                                    .frame(width: 130, height: 150)
+                        // Three fixed-width cards are wider than the screen. In a plain HStack
+                        // that would stretch the whole page (a VStack grows to fit its widest
+                        // child). A horizontal ScrollView always accepts the width it's offered,
+                        // just like the loaded state below. Flutter: an unconstrained Row vs a
+                        // horizontal ListView.
+                        ScrollView(.horizontal) {
+                            HStack(spacing: 12) {
+                                ForEach(0..<3, id: \.self) { _ in
+                                    SkeletonBlock(cornerRadius: 20)
+                                        .frame(width: 130, height: 150)
+                                }
                             }
+                            .padding(.vertical, 6)
                         }
+                        .scrollDisabled(true)
+                        .scrollIndicators(.hidden)
+                        .scrollClipDisabled()
 
                     case .loaded(let people) where people.isEmpty:
                         unavailable

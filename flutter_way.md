@@ -89,11 +89,11 @@ When a view is **inserted or removed** (an `if`, a `switch` case, a `ForEach` it
 - See it on the **Favorites** tab: un-heart a film and the card shrinks away.
 
 ### Carousel (`PageView` + `Transform`)
-- `GhibliSwiftUIApp/Views/HeroCarousel.swift:41`: `.scrollTransition` maps scroll position (−1…0…1) to a scale, a 3D tilt and opacity.
-- `GhibliSwiftUIApp/Views/HeroCarousel.swift:98`: the same tool used for parallax on the artwork.
+- `GhibliSwiftUIApp/Views/HeroCarousel.swift:41`: `.scrollTransition` maps scroll position (−1…0…1) to a scale and opacity.
+- `GhibliSwiftUIApp/Views/HeroCarousel.swift:102`: the same tool used for a subtle parallax on the artwork.
 - `GhibliSwiftUIApp/Views/HeroCarousel.swift:55`: `.scrollPosition(id:)` two-way binds the current page (like a `PageController`).
 - `GhibliSwiftUIApp/Views/HeroCarousel.swift:65`: `.task` loop auto-advances every 5s (a `Timer.periodic` that cancels itself).
-- **Try:** change `-14` in `rotation3DEffect` to `-45`.
+- **Try:** change the parallax offset from `-20` to `-80` and the auto-advance curve from `.snappy(duration: 0.45)` to `.smooth(duration: 1.2)`, and feel how quickly motion starts to look forced. Subtle usually wins.
 
 ### Heart burst (`TweenSequence` × several properties)
 - `GhibliSwiftUIApp/Views/FavoriteButton.swift:39`: SF Symbols morph from outline to filled.

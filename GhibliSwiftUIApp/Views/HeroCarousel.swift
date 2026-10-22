@@ -39,11 +39,11 @@ struct HeroCarousel: View {
                         // `scrollTransition` hands you `phase.value`: -1 (off to the left),
                         // 0 (centered) and 1 (off to the right). Map it to any effect you like.
                         .scrollTransition(axis: .horizontal) { content, phase in
+                            // Side cards shrink and fade a little. (A 3D tilt via
+                            // `rotation3DEffect` looks tempting here, but with perspective the
+                            // near edge grows past the card's frame and draws over its neighbour.)
                             content
                                 .scaleEffect(1 - abs(phase.value) * 0.08)
-                                .rotation3DEffect(.degrees(phase.value * -14),
-                                                  axis: (x: 0, y: 1, z: 0),
-                                                  perspective: 0.5)
                                 .opacity(1 - abs(phase.value) * 0.4)
                         }
                     }
@@ -67,7 +67,9 @@ struct HeroCarousel: View {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(5))
                 guard !Task.isCancelled else { return }
-                withAnimation(.smooth(duration: 0.8)) {
+                // A snappy curve settles quickly. Slow curves like `.smooth(duration: 0.8)`
+                // have a long tail that makes the card visibly creep into place.
+                withAnimation(.snappy(duration: 0.45)) {
                     currentID = nextID()
                 }
             }
@@ -94,9 +96,11 @@ private struct HeroCard: View {
         FilmImageView(urlPath: film.bannerImage)
             // Make the artwork larger than the card, then slide it against the scroll
             // direction. The image moves slower than its frame, which reads as depth (parallax).
-            .scaleEffect(1.3)
+            // Keep it subtle: the zoom only needs to cover the offset (6% of a ~360pt card
+            // is ~21pt per side, enough for a 20pt shift). Bigger values look forced.
+            .scaleEffect(1.12)
             .scrollTransition(axis: .horizontal) { content, phase in
-                content.offset(x: phase.value * -50)
+                content.offset(x: phase.value * -20)
             }
             .overlay { theme.posterScrim }
             .overlay(alignment: .bottomLeading) {
